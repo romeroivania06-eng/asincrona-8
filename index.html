@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="es" class="smooth-scroll">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecosistema Tech | Informe Maestro</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           1. SISTEMA DE DISEÑO (DESIGN TOKENS)
+           ========================================================================== */
+        :root {
+            /* Paleta de Colores Base */
+            --bg-void: #050505;
+            --bg-surface-1: #0a0a0a;
+            --bg-surface-2: #141414;
+            --bg-surface-3: rgba(25, 25, 25, 0.6);
+            
+            /* Colores Neón / Acentos */
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #ff00ea;
+            --neon-purple: #b026ff;
+            --neon-yellow: #fffb00;
+            --neon-green: #00ff66;
+
+            /* Tipografía */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-muted: #555555;
+            
+            /* Gradientes Maestros */
+            --grad-cyber: linear-gradient(135deg, var(--neon-magenta) 0%, var(--neon-cyan) 100%);
+            --grad-hologram: linear-gradient(180deg, rgba(0, 243, 255, 0.2) 0%, rgba(176, 38, 255, 0.05) 100%);
+            --grad-dark-glass: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+
+            /* Efectos y Sombras */
+            --shadow-neon-cyan: 0 0 20px rgba(0, 243, 255, 0.3), 0 0 40px rgba(0, 243, 255, 0.1);
+            --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.08);
+            
+            /* Tipografía Fluida (Clamp) */
+            --font-display: clamp(3rem, 8vw, 7rem);
+            --font-h1: clamp(2.5rem, 5vw, 4.5rem);
+            --font-h2: clamp(1.8rem, 3vw, 2.5rem);
+            --font-body: clamp(1rem, 1.2vw, 1.125rem);
+            
+            /* Familias */
+            --font-sans: 'Outfit', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+
+            /* Espaciado */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 2rem;
+            --space-lg: 4rem;
+            --space-xl: 8rem;
+        }
+
+        /* ==========================================================================
+           2. RESET & SETUP GLOBAL
+           ========================================================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html.smooth-scroll {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-void);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Custom Scrollbar (Cyberpunk Style) */
+        ::-webkit-scrollbar {
+            width: 10px;
+            background: var(--bg-void);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-surface-3);
+            border-radius: 5px;
+            border: 1px solid var(--neon-cyan);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--neon-cyan);
+        }
+
+        /* Selección de texto */
+        ::selection {
+            background: var(--neon-magenta);
+            color: #fff;
+        }
+
+        /* ==========================================================================
+           3. BACKGROUND VFX (Visual Effects Layer)
+           ========================================================================== */
+        
+        /* Grid de Ingeniería de precisión */
+        .vfx-grid {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -4;
+            pointer-events: none;
+            perspective: 1000px;
+        }
+
+        /* Capa de Ruido Estático para textura fílmica */
+        .vfx-noise {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+            opacity: 0.04;
+            z-index: -1;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
+        /* Luces Volumétricas Ambientales */
+        .ambient-light {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.4;
+            z-index: -3;
+            animation: pulse-light 12s infinite alternate ease-in-out;
+            pointer-events: none;
+        }
+        .light-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--neon-purple); }
+        .light-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: var(--neon-cyan); animation-delay: -5s; }
+        .light-3 { top: 40%; left: 50%; width: 40vw; height: 40vw; background: rgba(255, 0, 234, 0.2); transform: translate(-50%, -50%); }
+
+        /* ==========================================================================
+           4. LOADER INICIAL CSS PURE
+           ========================================================================== */
+        .loader-wrapper {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg-void);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: fadeOutLoader 1s ease-in-out 2s forwards;
+        }
+        .loader-ring {
+            width: 100px; height: 100px;
+            border: 3px solid transparent;
+            border-top-color: var(--neon-cyan);
+            border-right-color: var(--neon-magenta);
+            border-radius: 50%;
+            animation: spinRing 1s linear infinite;
+            position: relative;
+        }
+        .loader-ring::before {
+            content: ''; position: absolute;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            border: 3px solid transparent; border-bottom-color: var(--neon-purple); border-left-color: var(--neon-cyan);
+            border-radius: 50%; animation: spinRing 2s linear infinite reverse;
+        }
+        .loader-text {
+            margin-top: 20px; font-family: var(--font-mono); color: var(--neon-cyan);
+            letter-spacing: 5px; text-transform: uppercase; font-size: 0.8rem;
+            animation: glitch 1s infinite;
+        }
+
+        /* ==========================================================================
+           5. HEADER & NAVIGATION GLASSMORPHISM
+           ========================================================================== */
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 90px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 5%;
+            background: rgba(5, 5, 5, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 1000;
+            transition: all 0.4s ease;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+        
+        .brand-icon {
+            width: 30px; height: 30px;
+            background: var(--grad-cyber);
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            box-shadow: var(--shadow-neon-cyan);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        nav { display: flex; gap: 3rem; }
+        
+        nav a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+            padding: 5px 0;
+            transition: color 0.3s ease;
+        }
+
+        nav a::before {
+            content: '< ';
+            color: var(--neon-magenta);
+            opacity: 0; transform: translateX(10px); transition: all 0.3s ease;
+        }
+        nav a::after {
+            content: ' />';
+            color: var(--neon-cyan);
+            opacity: 0; transform: translateX(-10px); transition: all 0.3s ease;
+        }
+
+        nav a:hover { color: var(--text-primary); }
+        nav a:hover::before, nav a:hover::after { opacity: 1; transform: translateX(0); }
+
+        .btn-outline {
+            padding: 10px 24px;
+            border: 1px solid var(--neon-cyan);
+            background: transparent;
+            color: var(--neon-cyan);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .btn-outline::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--neon-cyan); transform: scaleX(0); transform-origin: right; transition: transform 0.4s ease; z-index: -1;
+        }
+        .btn-outline:hover { color: var(--bg-void); }
+        .btn-outline:hover::before { transform: scaleX(1); transform-origin: left; }
+
+        /* ==========================================================================
+           6. HERO SECTION - KINETIC TYPOGRAPHY
+           ========================================================================== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: var(--space-xl) 5% var(--space-lg);
+            text-align: center;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: rgba(0, 243, 255, 0.05);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 50px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--neon-cyan);
+            margin-bottom: 2rem;
+            animation: slideDown 1s ease-out;
+        }
+        .status-badge .dot {
+            width: 8px; height: 8px; background: var(--neon-cyan); border-radius: 50%; box-shadow: 0 0 10px var(--neon-cyan); animation: blink 2s infinite;
+        }
+
+        .hero h1 {
+            font-size: var(--font-display);
+            line-height: 0.95;
+            text-transform: uppercase;
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .text-gradient {
+            background: var(--grad-cyber);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .text-outline {
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.5);
+            display: block;
+        }
+
+        .hero p {
+            max-width: 600px;
+            font-size: var(--font-body);
+            color: var(--text-secondary);
+            margin: 0 auto 3rem;
+            font-weight: 300;
+        }
+
+        /* Decoración Geométrica 3D Abstracta en Hero */
+        .cube-wireframe {
+            position: absolute;
+            width: 300px; height: 300px;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            z-index: -1;
+            animation: morph-spin 20s linear infinite;
+        }
+        .cube-wireframe::before {
+            content: ''; position: absolute; inset: -20px; border: 1px dashed var(--neon-purple); border-radius: inherit; animation: morph-spin 15s linear infinite reverse; opacity: 0.3;
+        }
+
+        /* ==========================================================================
+           7. CINTA MARQUEE ANIMADA (Ticker)
+           ========================================================================== */
+        .marquee-container {
+            width: 100vw;
+            padding: 20px 0;
+            background: var(--neon-cyan);
+            color: var(--bg-void);
+            overflow: hidden;
+            display: flex;
+            white-space: nowrap;
+            transform: rotate(-2deg) scale(1.1);
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.4);
+        }
+        .marquee-content {
+            display: flex;
+            animation: scroll-marquee 20s linear infinite;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+        .marquee-item {
+            margin: 0 2rem; display: flex; align-items: center; gap: 1rem;
+        }
+        .marquee-item i { font-style: normal; color: var(--bg-void); opacity: 0.5; }
+
+        /* ==========================================================================
+           8. LAYOUT: BENTO BOX GRID (Estado del Arte)
+           ========================================================================== */
+        .section-wrapper {
+            padding: var(--space-xl) 5%;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            margin-bottom: var(--space-lg);
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-glass);
+            padding-bottom: var(--space-sm);
+        }
+
+        .section-header h2 {
+            font-size: var(--font-h1);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .section-header p {
+            font-family: var(--font-mono);
+            color: var(--neon-magenta);
+            text-align: right;
+            max-width: 300px;
+        }
+
+        /* La Magia del Bento Grid */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 300px;
+            gap: 24px;
+        }
+
+        /* Tarjeta Base de Alto Rendimiento */
+        .bento-card {
+            background: var(--grad-dark-glass);
+            border: var(--border-glass);
+            border-radius: 24px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Efecto de Hover Pro (Resplandor en bordes y elevación) */
+        .bento-card::before {
+            content: ''; position: absolute; inset: 0; background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06), transparent 40%); opacity: 0; transition: opacity 0.5s; z-index: 1; pointer-events: none;
+        }
+        .bento-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(0, 243, 255, 0.1);
+        }
+        .bento-card:hover::before { opacity: 1; }
+
+        /* Contenido interno de la tarjeta */
+        .bento-card-content { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; }
+        
+        .card-icon {
+            width: 50px; height: 50px; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center;
+            border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: var(--neon-cyan); transition: transform 0.3s ease;
+        }
+        .bento-card:hover .card-icon { transform: scale(1.1) rotate(5deg); background: rgba(0, 243, 255, 0.1); border-color: var(--neon-cyan); }
+
+        .bento-card h3 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #fff; }
+        .bento-card p { font-size: 1rem; color: var(--text-secondary); line-height: 1.5; flex-grow: 1; }
+        
+        .card-tag { font-family: var(--font-mono); font-size: 0.75rem; padding: 4px 10px; border-radius: 4px; background: rgba(255,255,255,0.1); display: inline-block; margin-top: 1rem; align-self: flex-start; }
+
+        /* Asignación de espacios en el Grid (La asimetría del Bento) */
+        .card-large { grid-column: span 2; grid-row: span 2; }
+        .card-wide { grid-column: span 2; grid-row: span 1; }
+        .card-tall { grid-column: span 1; grid-row: span 2; }
+        .card-normal { grid-column: span 1; grid-row: span 1; }
+
+        /* ==========================================================================
+           9. SECCIÓN METODOLOGÍA (Listado Analítico con Counters)
+           ========================================================================== */
+        .methodology-list {
+            display: flex; flex-direction: column; gap: 2rem; margin-top: var(--space-md);
+            counter-reset: tech-counter;
+        }
+        .method-item {
+            display: flex; align-items: flex-start; gap: 2rem; padding: 2rem;
+            background: rgba(20, 20, 20, 0.5); border-left: 2px solid var(--neon-purple); border-radius: 0 16px 16px 0;
+            transition: all 0.3s ease; position: relative; overflow: hidden;
+        }
+        .method-item:hover { background: rgba(30, 30, 30, 0.8); padding-left: 3rem; }
+        .method-item::before {
+            counter-increment: tech-counter; content: "0" counter(tech-counter);
+            font-family: var(--font-mono); font-size: 4rem; font-weight: 900; line-height: 0.8;
+            color: rgba(255, 255, 255, 0.03); position: absolute; right: 20px; top: 20px;
+        }
+        .method-content h4 { font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-primary); }
+        .method-content p { color: var(--text-secondary); max-width: 800px; }
+
+        /* ==========================================================================
+           10. FOOTER ULTRA-TECH
+           ========================================================================== */
+        footer {
+            border-top: 1px solid var(--border-glass);
+            padding: var(--space-lg) 5% var(--space-md);
+            background: linear-gradient(to top, #000, transparent);
+            position: relative;
+        }
+        .footer-grid {
+            display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 4rem; margin-bottom: 4rem;
+        }
+        .footer-brand h2 { font-size: 2rem; font-family: var(--font-mono); margin-bottom: 1rem; }
+        .footer-brand p { color: var(--text-muted); max-width: 400px; }
+        .footer-links h4 { color: var(--neon-cyan); margin-bottom: 1.5rem; font-family: var(--font-mono); }
+        .footer-links ul { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: var(--text-secondary); text-decoration: none; transition: color 0.3s; }
+        .footer-links a:hover { color: var(--neon-magenta); }
+        .footer-bottom {
+            display: flex; justify-content: space-between; align-items: center; padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.05); font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted);
+        }
+
+        /* ==========================================================================
+           11. KEYFRAMES & ANIMACIONES COMPLEJAS
+           ========================================================================== */
+        @keyframes pulse-light { 0% { transform: scale(1); opacity: 0.3; } 100% { transform: scale(1.2); opacity: 0.6; } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes morph-spin { 0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transform: translate(-50%, -50%) rotate(0deg); } 50% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; transform: translate(-50%, -50%) rotate(180deg); } 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transform: translate(-50%, -50%) rotate(360deg); } }
+        @keyframes scroll-marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        @keyframes fadeOutLoader { 100% { opacity: 0; visibility: hidden; } }
+        @keyframes spinRing { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes slideDown { 0% { opacity: 0; transform: translateY(-20px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes glitch { 0% { transform: translate(0) } 20% { transform: translate(-2px, 2px) } 40% { transform: translate(-2px, -2px) } 60% { transform: translate(2px, 2px) } 80% { transform: translate(2px, -2px) } 100% { transform: translate(0) } }
+
+        /* ==========================================================================
+           12. RESPONSIVE DESIGN (Media Queries)
+           ========================================================================== */
+        @media (max-width: 1200px) {
+            .bento-grid { grid-template-columns: repeat(3, 1fr); }
+            .card-large { grid-column: span 3; }
+        }
+        @media (max-width: 992px) {
+            .bento-grid { grid-template-columns: repeat(2, 1fr); }
+            .card-wide, .card-large { grid-column: span 2; }
+            .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .section-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .section-header p { text-align: left; }
+        }
+        @media (max-width: 768px) {
+            nav { display: none; } /* En un proyecto real aquí iría un menú hamburguesa */
+            .bento-grid { grid-template-columns: 1fr; grid-auto-rows: auto; }
+            .card-wide, .card-large, .card-tall, .card-normal { grid-column: span 1; grid-row: auto; min-height: 250px; }
+            .marquee-container { transform: rotate(0deg) scale(1); }
+            .method-item { flex-direction: column; gap: 1rem; }
+            .method-item:hover { padding-left: 2rem; transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loader-wrapper">
+        <div class="loader-ring"></div>
+        <div class="loader-text">Inicializando Entorno...</div>
+    </div>
+
+    <div class="vfx-grid"></div>
+    <div class="vfx-noise"></div>
+    <div class="ambient-light light-1"></div>
+    <div class="ambient-light light-2"></div>
+    <div class="ambient-light light-3"></div>
+
+    <header>
+        <div class="brand">
+            <div class="brand-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            </div>
+            Informe.Tech
+        </div>
+        <nav>
+            <a href="#inicio">Núcleo</a>
+            <a href="#estado">Estado del Arte</a>
+            <a href="#metodo">Arquitectura</a>
+            <a href="#futuro">Proyección</a>
+        </nav>
+        <button class="btn-outline">Descargar Data</button>
+    </header>
+
+    <main>
+        <section id="inicio" class="hero">
+            <div class="cube-wireframe"></div>
+            <div class="status-badge">
+                <div class="dot"></div> Análisis de Sistemas Complejos Activo
+            </div>
+            <h1>
+                <span class="text-outline">Ecosistema</span><br>
+                <span class="text-gradient">Tecnológico</span>
+            </h1>
+            <p>Una auditoría exhaustiva sobre la infraestructura de aprendizaje, integración algorítmica y el impacto del hardware en las metodologías cognitivas a temprana edad.</p>
+        </section>
+
+        <div class="marquee-container">
+            <div class="marquee-content">
+                <div class="marquee-item"><i>/</i> Inteligencia Artificial Educativa</div>
+                <div class="marquee-item"><i>/</i> Gamificación Paramétrica</div>
+                <div class="marquee-item"><i>/</i> Brecha Digital Cero</div>
+                <div class="marquee-item"><i>/</i> Infraestructura Sostenible</div>
+                <div class="marquee-item"><i>/</i> UX Cognitiva</div>
+                <div class="marquee-item"><i>/</i> Inteligencia Artificial Educativa</div>
+                <div class="marquee-item"><i>/</i> Gamificación Paramétrica</div>
+                <div class="marquee-item"><i>/</i> Brecha Digital Cero</div>
+                <div class="marquee-item"><i>/</i> Infraestructura Sostenible</div>
+                <div class="marquee-item"><i>/</i> UX Cognitiva</div>
+            </div>
+        </div>
+
+        <section id="estado" class="section-wrapper">
+            <div class="section-header">
+                <h2>Estado<br>Del Arte</h2>
+                <p>Mapeo de la situación actual, métricas de rendimiento y cuellos de botella del sistema analógico.</p>
+            </div>
+
+            <div class="bento-grid">
+                
+                <article class="bento-card card-large">
+                    <div class="bento-card-content">
+                        <div class="card-icon" style="background: rgba(255, 0, 234, 0.1); color: var(--neon-magenta); border-color: rgba(255, 0, 234, 0.3);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path></svg>
+                        </div>
+                        <h3 style="font-size: 2.5rem;">El Aula como Nodo Híbrido</h3>
+                        <p style="font-size: 1.1rem; max-width: 90%;">El paradigma ha mutado. La dotación de hardware aislado es ineficiente. La infraestructura tecnológica debe operar como una red neuronal donde hardware, currículo y capacitación docente forman un ecosistema cerrado y auto-sostenible.</p>
+                        <span class="card-tag" style="color: var(--neon-magenta); border-color: var(--neon-magenta);">#SISTEMAS_COMPLEJOS</span>
+                    </div>
+                </article>
+
+                <article class="bento-card card-tall">
+                    <div class="bento-card-content">
+                        <div class="card-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                        </div>
+                        <h3>Dinámicas Gamificadas</h3>
+                        <p>La gamificación ya no es lúdica, es algorítmica. Estructurar la resolución de problemas mediante mecánicas de recompensa variables incrementa la retención neurológica en un 40%.</p>
+                        <span class="card-tag">#UX_DISEÑO</span>
+                    </div>
+                </article>
+
+                <article class="bento-card card-normal">
+                    <div class="bento-card-content">
+                        <div class="card-icon" style="color: var(--neon-purple);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                        </div>
+                        <h3>Auditoría Docente</h3>
+                        <p>Evaluación de métricas de adaptación a tecnologías emergentes y herramientas de IA.</p>
+                    </div>
+                </article>
+
+                <article class="bento-card card-normal">
+                    <div class="bento-card-content">
+                        <div class="card-icon" style="color: var(--neon-yellow);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l3-9 5 18 3-9h5"></path></svg>
+                        </div>
+                        <h3>Latencia y Hardware</h3>
+                        <p>El "downtime" tecnológico es el mayor enemigo de la continuidad educativa en zonas rurales.</p>
+                    </div>
+                </article>
+
+                <article class="bento-card card-wide">
+                    <div class="bento-card-content">
+                        <div class="card-icon" style="background: rgba(0, 255, 102, 0.1); color: var(--neon-green); border-color: rgba(0, 255, 102, 0.3);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </div>
+                        <h3>Protocolos de Derechos Fundamentales</h3>
+                        <p>El acceso a ancho de banda y terminales de procesamiento ha dejado de ser un lujo operativo para convertirse en un Derecho Humano fundamental de la era de la información. La carencia de infraestructura es una vulnerabilidad social crítica.</p>
+                        <span class="card-tag" style="color: var(--neon-green); border-color: var(--neon-green);">#SEGURIDAD_SOCIAL</span>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <section id="metodo" class="section-wrapper">
+            <div class="section-header">
+                <h2>Arquitectura<br>de Implementación</h2>
+                <p>Vectorizando la enseñanza: pasos críticos para la transición digital de entornos educativos estandarizados.</p>
+            </div>
+
+            <div class="methodology-list">
+                <div class="method-item">
+                    <div class="method-content">
+                        <h4>Despliegue de Infraestructura Zero-Trust</h4>
+                        <p>Instalación de redes malladas (mesh networks) y hardware resistente. Se requiere diseño para tolerancia a fallos y mantenimiento remoto predictivo.</p>
+                    </div>
+                </div>
+                <div class="method-item">
+                    <div class="method-content">
+                        <h4>Refactorización Curricular</h4>
+                        <p>Inyección de lógica computacional y pensamiento algorítmico en asignaturas de humanidades. El código como lenguaje transversal.</p>
+                    </div>
+                </div>
+                <div class="method-item">
+                    <div class="method-content">
+                        <h4>Monitoreo de Carga Cognitiva</h4>
+                        <p>Uso de analíticas de aprendizaje para medir el ratio señal-ruido en la interfaz del alumno, evitando el "burnout" por sobreexposición a pantallas no interactivas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="brand-icon" style="margin-bottom: 1rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                </div>
+                <h2>INFORME.TECH</h2>
+                <p>Ingeniería de metodologías para el futuro del desarrollo cognitivo automatizado.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Core Data</h4>
+                <ul>
+                    <li><a href="#">Documentación API</a></li>
+                    <li><a href="#">Repositorio de Tesis</a></li>
+                    <li><a href="#">Métricas en Tiempo Real</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Sistemas</h4>
+                <ul>
+                    <li><a href="#">Protocolos de Seguridad</a></li>
+                    <li><a href="#">Licencias MIT</a></li>
+                    <li><a href="#">Soporte Terminal</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>SYS_ADMIN: INVESTIGACIÓN METODOLÓGICA</span>
+            <span>v. 2026.4.2 // RENDERIZADO COMPLETADO</span>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.bento-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body>
+</html>
